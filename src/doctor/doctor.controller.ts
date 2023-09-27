@@ -14,7 +14,7 @@ import {
 import { DoctorService } from './doctor.service';
 import { CreateDoctorDto, LoginDto } from './dto/create-doctor.dto';
 import { ChangePassword, UpdateDoctorDto } from './dto/update-doctor.dto';
-import { AuthGuard, RoleGuard, Roles } from './doctor.guard';
+import { AuthGuard, AuthorGuard, RoleGuard, Roles } from './doctor.guard';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
@@ -79,6 +79,7 @@ export class DoctorController {
   }
 
   @Put('/:id')
+  @UseGuards(AuthorGuard)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: Doctor })
@@ -90,6 +91,7 @@ export class DoctorController {
   }
 
   @Delete('/:id')
+  @UseGuards(AuthorGuard)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: Doctor })
@@ -98,6 +100,7 @@ export class DoctorController {
   }
 
   @Patch('/change-password/:id')
+  @UseGuards(AuthorGuard)
   @UseGuards(AuthGuard)
   changePassword(
     @Param('id') id: string,
