@@ -79,21 +79,17 @@ export class DoctorController {
   }
 
   @Put('/:id')
-  @UseGuards(RoleGuard)
-  @Roles('doctor')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: Doctor })
   updateDoctor(
     @Param('id') id: string,
-    @Body() updateDoctorDto: UpdateDoctorDto,
+    @Body() updateDoctorDto: UpdateDoctorDto, role: 'doctor'
   ) {
-    return this.doctorService.updateDoctor(id, updateDoctorDto);
+    return this.doctorService.updateDoctor(id, role, updateDoctorDto);
   }
 
   @Delete('/:id')
-  @UseGuards(RoleGuard)
-  @Roles('doctor')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: Doctor })
@@ -102,8 +98,6 @@ export class DoctorController {
   }
 
   @Patch('/change-password/:id')
-  @UseGuards(RoleGuard)
-  @Roles('doctor')
   @UseGuards(AuthGuard)
   changePassword(
     @Param('id') id: string,
