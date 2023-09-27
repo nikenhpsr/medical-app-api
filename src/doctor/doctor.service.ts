@@ -108,7 +108,7 @@ export class DoctorService {
     return doctor;
   }
 
-  async updateDoctor(id: string, role: string, updateDoctorDto: UpdateDoctorDto) {
+  async updateDoctor(id: string, updateDoctorDto: UpdateDoctorDto) {
     const doctor = await this.prismaService.doctor.findUnique({
       where: { id: id },
     });

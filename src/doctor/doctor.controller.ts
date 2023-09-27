@@ -84,9 +84,9 @@ export class DoctorController {
   @ApiOkResponse({ type: Doctor })
   updateDoctor(
     @Param('id') id: string,
-    @Body() updateDoctorDto: UpdateDoctorDto, role: 'doctor'
+    @Body() updateDoctorDto: UpdateDoctorDto
   ) {
-    return this.doctorService.updateDoctor(id, role, updateDoctorDto);
+    return this.doctorService.updateDoctor(id, updateDoctorDto);
   }
 
   @Delete('/:id')
