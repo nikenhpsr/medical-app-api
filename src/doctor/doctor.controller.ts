@@ -14,7 +14,7 @@ import {
 import { DoctorService } from './doctor.service';
 import { CreateDoctorDto, LoginDto } from './dto/create-doctor.dto';
 import { ChangePassword, UpdateDoctorDto } from './dto/update-doctor.dto';
-import { AuthGuard, RoleGuard, Roles } from './doctor.guard';
+import { AuthGuard, AuthorGuard, RoleGuard, Roles } from './doctor.guard';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
@@ -28,7 +28,7 @@ import { Request } from 'express';
 @Controller('doctor')
 @ApiTags('doctor')
 export class DoctorController {
-  constructor(private readonly doctorService: DoctorService) {}
+  constructor(private readonly doctorService: DoctorService) { }
 
   /// AUTH CONTROLLER
   @Post('/auth/login')
@@ -46,24 +46,12 @@ export class DoctorController {
 
   // FILTER DOCTOR BY NAME, LOCATION AND HOSPITAL
   @Get('/query')
-  searchDoctor(
-    @Query('name') name: string,
-    @Query('location') location: string,
-    @Query('hospital') hospital: string,
-  ) {
-    const data = {
-      name: name,
-      location: location,
-      hospital: hospital,
-    };
-    return this.doctorService.searchDoctor(data);
+  searchDoctor(@Query('name') name: string) {
+    return this.doctorService.searchDoctor(name);
   }
 
   /// BASIC CRUD
   @Get('/')
-  @UseGuards(RoleGuard)
-  @Roles('doctor')
-  @UseGuards(AuthGuard)
   @ApiOkResponse({ type: Doctor, isArray: true })
   @ApiQuery({
     name: 'q',
@@ -76,30 +64,25 @@ export class DoctorController {
   }
 
   @Get('/:id')
-  @UseGuards(RoleGuard)
-  @Roles('doctor')
-  @UseGuards(AuthGuard)
   @ApiOkResponse({ type: Doctor })
   getDoctorById(@Param('id') id: string) {
     return this.doctorService.getDoctorById(id);
   }
 
   @Put('/:id')
-  @UseGuards(RoleGuard)
-  @Roles('doctor')
+  @UseGuards(AuthorGuard)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: Doctor })
   updateDoctor(
     @Param('id') id: string,
-    @Body() updateDoctorDto: UpdateDoctorDto,
+    @Body() updateDoctorDto: UpdateDoctorDto
   ) {
     return this.doctorService.updateDoctor(id, updateDoctorDto);
   }
 
   @Delete('/:id')
-  @UseGuards(RoleGuard)
-  @Roles('doctor')
+  @UseGuards(AuthorGuard)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: Doctor })
@@ -108,8 +91,7 @@ export class DoctorController {
   }
 
   @Patch('/change-password/:id')
-  @UseGuards(RoleGuard)
-  @Roles('doctor')
+  @UseGuards(AuthorGuard)
   @UseGuards(AuthGuard)
   changePassword(
     @Param('id') id: string,

@@ -4,7 +4,12 @@ import {
   UnauthorizedException,
   ConflictException,
 } from '@nestjs/common';
-import { CreateDoctorDto, LoginDto, DoctorDto, SearchDoctor } from './dto/create-doctor.dto';
+import {
+  CreateDoctorDto,
+  LoginDto,
+  DoctorDto,
+  SearchDoctor,
+} from './dto/create-doctor.dto';
 import { UpdateDoctorDto, ChangePassword } from './dto/update-doctor.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -76,7 +81,6 @@ export class DoctorService {
           createDoctorDto.password,
           Number(process.env['HASH_SALT']),
         ),
-        role: 'doctor',
       },
     });
     newDoctor.password = undefined;
@@ -111,9 +115,9 @@ export class DoctorService {
     const updatedData = {
       email: updateDoctorDto.email || doctor.email,
       name: updateDoctorDto.name || doctor.name,
-      imageUrl: updateDoctorDto.imageURL || doctor.imageURL,
+      imageURL: updateDoctorDto.imageURL || doctor.imageURL,
       hospital: updateDoctorDto.hospital || doctor.hospital,
-      schedule: JSON.stringify([updateDoctorDto.schedule]) || doctor.schedule,
+      schedule: JSON.stringify(updateDoctorDto.schedule) || doctor.schedule,
     };
     if (!doctor) {
       throw new NotFoundException();
@@ -133,31 +137,31 @@ export class DoctorService {
     if (!doctor) {
       throw new NotFoundException();
     }
-    if (id !== req['user'].sub) {
-      throw new UnauthorizedException();
-    }
     await this.prismaService.doctor.delete({
       where: { id },
     });
   }
 
-  async searchDoctor(data: SearchDoctor) {
+  async searchDoctor(data: string) {
     const response = await this.prismaService.doctor.findMany({
       where: {
         OR: [
           {
             name: {
-              contains: String(data.name).toLowerCase(),
+              contains: String(data).toLowerCase(),
+              mode: 'insensitive',
             },
           },
           {
             location: {
-              contains: String(data.location).toLowerCase(),
+              contains: String(data).toLowerCase(),
+              mode: 'insensitive',
             },
           },
           {
             hospital: {
-              contains: String(data.hospital).toLowerCase(),
+              contains: String(data).toLowerCase(),
+              mode: 'insensitive',
             },
           },
         ],
@@ -166,6 +170,9 @@ export class DoctorService {
     if (!response) {
       throw new NotFoundException();
     }
+    response.map((res) => {
+      res.password = undefined;
+    });
     return response;
   }
 
